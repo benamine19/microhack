@@ -163,7 +163,6 @@ def chef_modifier_tache(request):
 
 
 
-
 @api_view(['PUT'])
 def chef_modifier_tache(request, tache_id):
         chef_id = request.data.get('chef_id')
@@ -277,4 +276,5 @@ def get_all_employes(request):
         employes = Employe.objects.all()
         serializer = EmployeSerializer(employes, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
 
