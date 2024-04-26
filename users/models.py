@@ -62,3 +62,5 @@ class Tache(models.Model):
     class Meta:
         verbose_name = "Tâche"
         verbose_name_plural = "Tâches"
+        
+        
