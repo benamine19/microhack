@@ -1,8 +1,10 @@
 import json
 from openai import OpenAI
+from dotenv import load_dotenv
+import os
 
 def VoiceToTask(audio_path):
-    client = OpenAI(api_key="")
+    client = OpenAI(api_key=os.getenv("API_KEY"))
 
     audio_file = open(audio_path, "rb")
     transcription = client.audio.transcriptions.create(
