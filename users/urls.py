@@ -7,6 +7,9 @@ urlpatterns =[
     path('login/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('RegisterViewChef/', RegisterView.as_view(), name='RegisterView'),
     path('chef_add_employe/', chef_add_employe, name='chef_add_employe'),
-    path('chef_add_tache/', chef_add_tache, name='chef_add_tache'),
+    path('chef_add_tache_form/', chef_add_tache_form, name='chef_add_tache_form'),
+    path('chef_add_tache_audio/', chef_add_tache_audio, name='chef_add_tache_audio'),
+    path('associate_tasks_to_employes_manually/', associate_tasks_to_employes_manually, name='associate_tasks_to_employes_manually'),
+    
 
 ]
