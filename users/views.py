@@ -271,13 +271,10 @@ def get_all_taches(request):
 
 
 
-
+         
 @api_view(['GET'])
 def get_all_employes(request):
         employes = Employe.objects.all()
         serializer = EmployeSerializer(employes, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
-
-
-
 
