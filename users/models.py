@@ -66,5 +66,19 @@ class Tache(models.Model):
     class Meta:
         verbose_name = "Tâche"
         verbose_name_plural = "Tâches"
+
+#The Employee can respond to the task by uploading an image and an audio file
+class TaskResponse(models.Model):
+    task = models.ForeignKey(Tache, on_delete=models.CASCADE, related_name='responses')
+    image = models.ImageField(upload_to='photos/')
+    percentage = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(100)])
+    audio = models.FileField(upload_to='audios/')
+    
+    def __str__(self):
+        return f"Response for {self.tache}"
+
+    class Meta:
+        verbose_name = "Réponse de tâche"
+        verbose_name_plural = "Réponses de tâches"
         
         

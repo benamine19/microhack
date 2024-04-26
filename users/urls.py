@@ -13,5 +13,6 @@ urlpatterns =[
     path('chef_modifier_tache/', chef_modifier_tache, name='chef_modifier_tache'),
     path('chef_add_employes_to_tache/', chef_add_employes_to_tache, name='chef_add_employes_to_tache'),
     path('get_all_taches/', get_all_taches, name='get_all_taches'),
-    path('get_all_employes/', get_all_employes, name='get_all_employes'),    
+    path('get_all_employes/', get_all_employes, name='get_all_employes'),  
+    path('add_task_response/', add_task_response, name='add_task_response'),     
 ]

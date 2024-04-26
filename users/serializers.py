@@ -54,3 +54,8 @@ class EmployeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Employe
         fields = "__all__"
+        
+class TacheResponseSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TaskResponse
+        fields = "__all__"
