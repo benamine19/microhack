@@ -4,8 +4,8 @@ from dotenv import load_dotenv
 import os
 
 def VoiceToTask(audio_path):
-    client = OpenAI(api_key=os.getenv("API_KEY"))
-
+    load_dotenv()
+    client = OpenAI(api_key=os.environ.get("API_KEY"))
     audio_file = open(audio_path, "rb")
     transcription = client.audio.transcriptions.create(
     model="whisper-1", 
@@ -15,24 +15,12 @@ def VoiceToTask(audio_path):
 
     Cretarias = {
         "Task" : "abstract the task from the managers message",
-        "Specialites": [    "Builder",
-                            "Electrician",
-                            "Plumber",
-                            "Painter",
-                            "Carpenter",
-                            "Mason",
-                            "Architect",
-                            "Engineer"],
+        "Specialites": "Give me an array of needed specialties with the estimated number of builders from this specialties in json format [Plumber,Carpenter,Mason,Genral]",
         "Importance": [ "High",
                         "Medium",
                         "Low",],
         "Duration": "estimate the duration to complete this task in this format dd:hh:mm",
-        "Names":"give me a list of the names of the workers that was listed in the managers message",
     }
-
-
-
-
     response = client.chat.completions.create(
     model="gpt-3.5-turbo-0125",
     response_format={ "type": "json_object" },
@@ -46,7 +34,7 @@ def VoiceToTask(audio_path):
     ]
     )
     json_data = json.loads(response.choices[0].message.content)
-
+    print(json_data)
     return json_data
 
 

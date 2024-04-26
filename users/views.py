@@ -17,6 +17,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
+from AI.TaskEvaluation import TaskEvaluation
 
 from AI.VoiceToTask import VoiceToTask
 # Create your views here.
@@ -112,16 +113,11 @@ def chef_add_tache_audio(request):
             destination.write(chunk)
     
     Task = VoiceToTask(save_path)
-    Task
-    print(Task)
+    
     # Récupérer le chef associé à l'identifiant fourni
     chef = get_object_or_404(Chef, id=chef_id)
 
-    #get the list of employes called by the manager
-    employes = []
-    
-
-        
+    #get the list of employes called by the manager      
     
     tache = Tache.objects.create(
                 chef=chef,
@@ -129,18 +125,6 @@ def chef_add_tache_audio(request):
                 description=Task["Task"],
                 duration = Task["Duration"],
             ) 
-    
-    for name in Task["Names"]:
-        name = name.lower()
-        user = User.objects.filter(Q(username__icontains=name) ).distinct().first()
-        print("brqqq /",user)
-        
-        if(user[0]):
-            print("sdfsdf /",user)
-            emp = get_object_or_404(user=user[0])
-            tache.employes.add(emp)
-            tache.save()
-    
     
     response_data = {
             'message': 'Tâche créée avec succès.',
@@ -163,18 +147,18 @@ def chef_add_tache_audio(request):
 #         return Response({"error": "Veuillez fournir chef_id, description, etat et importance."},
 #                         status=status.HTTP_400_BAD_REQUEST)
 #     # Récupérer le chef associé à l'identifiant fourni
-#     chef = get_object_or_404(Chef, id=chef_id)
-#     tache = Tache.objects.create(
-#                 chef=chef,
-#                 description=description,
-#                 etat=etat,
-#                 importance=importance
-#             )
-#     response_data = {
-#             'message': 'Tâche créée avec succès.',
-#             'data': TacheSerializer(tache).data
-#         }
-#     return Response(response_data, status=status.HTTP_201_CREATED)
+#  chef = get_object_or_404(Chef, id=chef_id)
+#  tache = Tache.objects.create(
+#              chef=chef,
+#              description=description,
+#              etat=etat,
+#              importance=importance
+#          )
+#  response_data = {
+#          'message': 'Tâche créée avec succès.',
+#          'data': TacheSerializer(tache).data
+#      }
+#  return Response(response_data, status=status.HTTP_201_CREATED)
 
 
 
@@ -210,6 +194,29 @@ def chef_modifier_tache(request):
 # Associate tasks manually to employes 
 @api_view(['POST'])
 def associate_tasks_to_employes_manually(request):
+    employes_id = request.data.get('employes_id', [])
+    tache_id = request.data.get('tache_id')
+    # Vérifier si tous les champs requis sont présents dans la requête
+    if not (employes_id and tache_id):
+        return Response({"error": "Veuillez fournir employes_id et tache_id."},
+                        status=status.HTTP_400_BAD_REQUEST)
+
+    # Récupérer la tâche associée à l'identifiant fourni
+    tache = get_object_or_404(Tache, id=tache_id)
+
+    # Récupérer la liste des employés associés aux identifiants fournis
+    for emp_id in employes_id:
+        employe = get_object_or_404(Employe, id=emp_id)
+        tache.employes.add(employe)
+
+    response_data = {
+        'message': 'Tâche associée aux employés avec succès.',
+        'data': TacheSerializer(tache).data
+    }
+    return Response(response_data, status=status.HTTP_200_OK)
+
+@api_view(['POST'])
+def associate_tasks_to_employes_automaticaly(request):
     employes_id = request.data.get('employes_id', [])
     tache_id = request.data.get('tache_id')
     # Vérifier si tous les champs requis sont présents dans la requête
@@ -345,3 +352,29 @@ def get_all_employes(request):
         serializer = EmployeSerializer(employes, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+@api_view(['POST'])
+def add_task_response(request):
+    if request.method == 'POST':
+        # Assuming the form field name for the image is 'image'
+        tache_id = request.data.get('tache_id')
+        image_file = request.FILES.get('image')
+        audio_file = request.FILES.get('audio')
+        
+        task = get_object_or_404(Tache, id=tache_id)
+        if image_file:
+            task_response = TaskResponse(task=task,image=image_file,audio = audio_file,percentage=0)
+            task_response.save()
+            Evaluation = TaskEvaluation(task.description,task_response.image.url)
+            print(Evaluation)
+            task_response.percentage = Evaluation["percentage"] 
+            response_data = {
+                    'message': 'Tâche supprimée avec succès.',
+                    'data': TacheResponseSerializer(task_response).data
+            }
+            return Response(response_data, status=status.HTTP_200_OK)
+        else:
+            return Response({"error": "No image"},
+                    status=status.HTTP_400_BAD_REQUEST)
+    else:
+        return Response({"error": "No image"},
+                    status=status.HTTP_400_BAD_REQUEST)
