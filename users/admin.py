@@ -4,3 +4,4 @@ from .models import *
 admin.site.register(User)
 admin.site.register(Chef)
 admin.site.register(Employe)
+admin.site.register(Tache)
