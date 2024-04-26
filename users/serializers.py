@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import User,Chef,Employe,Tache
+from .models import *
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework.validators import UniqueValidator
 from django.contrib.auth.password_validation import validate_password
@@ -48,4 +48,9 @@ class RegisterSerializerChef(serializers.ModelSerializer):
 class TacheSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tache
+        fields = "__all__"
+
+class EmployeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Employe
         fields = "__all__"
