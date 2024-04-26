@@ -150,7 +150,60 @@ def chef_add_tache_audio(request):
 
 
 
-# modifier un tache par le chef
+# le chef ajouter des emploie pour une tache  
+@api_view(['POST'])
+def chef_add_tache(request):
+    chef_id = request.data.get('chef_id')
+    employes_id = request.data.get('employes_id', [])
+    etat = request.data.get('etat')
+    importance = request.data.get('importance')
+    # print("etat",etat)
+    # Vérifier si tous les champs requis sont présents dans la requête
+    if not (chef_id and description and etat and importance):
+        return Response({"error": "Veuillez fournir chef_id, description, etat et importance."},
+                        status=status.HTTP_400_BAD_REQUEST)
+    # Récupérer le chef associé à l'identifiant fourni
+    chef = get_object_or_404(Chef, id=chef_id)
+    tache = Tache.objects.create(
+                chef=chef,
+                description=description,
+                etat=etat,
+                importance=importance
+            )
+    response_data = {
+            'message': 'Tâche créée avec succès.',
+            'data': TacheSerializer(tache).data
+        }
+    return Response(response_data, status=status.HTTP_201_CREATED)
+
+
+
+
+# le chef ajouter des emploie pour une tache  
+@api_view(['POST'])
+def chef_modifier_tache(request):
+    chef_id = request.data.get('chef_id')
+    description = request.data.get('description')
+    etat = request.data.get('etat')
+    importance = request.data.get('importance')
+    # print("etat",etat)
+    # Vérifier si tous les champs requis sont présents dans la requête
+    if not (chef_id and description and etat and importance):
+        return Response({"error": "Veuillez fournir chef_id, description, etat et importance."},
+                        status=status.HTTP_400_BAD_REQUEST)
+    # Récupérer le chef associé à l'identifiant fourni
+    chef = get_object_or_404(Chef, id=chef_id)
+    tache = Tache.objects.create(
+                chef=chef,
+                description=description,
+                etat=etat,
+                importance=importance
+            )
+    response_data = {
+            'message': 'Tâche créée avec succès.',
+            'data': TacheSerializer(tache).data
+        }
+    return Response(response_data, status=status.HTTP_201_CREATED)
 
 
 
@@ -177,4 +230,118 @@ def associate_tasks_to_employes_manually(request):
         'data': TacheSerializer(tache).data
     }
     return Response(response_data, status=status.HTTP_200_OK)
+
+@api_view(['PUT'])
+def chef_modifier_tache(request, tache_id):
+        chef_id = request.data.get('chef_id')
+        description = request.data.get('description')
+        etat = request.data.get('etat')
+        importance = request.data.get('importance')
+        
+        # Vérifier si tous les champs requis sont présents dans la requête
+        if not (chef_id and description and etat and importance):
+            return Response({"error": "Veuillez fournir chef_id, description, etat et importance."},
+                            status=status.HTTP_400_BAD_REQUEST)
+        
+        # Récupérer le chef associé à l'identifiant fourni
+        chef = get_object_or_404(Chef, id=chef_id)
+        
+        # Récupérer la tâche à modifier
+        tache = get_object_or_404(Tache, id=tache_id)
+        
+        # Vérifier si le chef est le propriétaire de la tâche
+        if tache.chef != chef:
+            return Response({"error": "Vous n'êtes pas autorisé à modifier cette tâche."},
+                            status=status.HTTP_403_FORBIDDEN)
+        
+        # Mettre à jour les champs de la tâche
+        tache.description = description
+        tache.etat = etat
+        tache.importance = importance
+        tache.save()
+        
+        response_data = {
+            'message': 'Tâche modifiée avec succès.',
+            'data': TacheSerializer(tache).data
+        }
+        return Response(response_data, status=status.HTTP_200_OK)
+
+        # le chef ajoute des employés à une tâche
+@api_view(['POST'])
+def chef_add_employes_to_tache(request, tache_id):
+            chef_id = request.data.get('chef_id')
+            employes_id = request.data.get('employes_id', [])
+            
+            # Vérifier si tous les champs requis sont présents dans la requête
+            if not (chef_id and employes_id):
+                return Response({"error": "Veuillez fournir chef_id et employes_id."},
+                                status=status.HTTP_400_BAD_REQUEST)
+            
+            # Récupérer le chef associé à l'identifiant fourni
+            chef = get_object_or_404(Chef, id=chef_id)
+            
+            # Récupérer la tâche à laquelle ajouter les employés
+            tache = get_object_or_404(Tache, id=tache_id)
+            
+            # Vérifier si le chef est le propriétaire de la tâche
+            if tache.chef != chef:
+                return Response({"error": "Vous n'êtes pas autorisé à modifier cette tâche."},
+                                status=status.HTTP_403_FORBIDDEN)
+            
+            # Ajouter les employés à la tâche
+            for emp_id in employes_id:
+                employe = get_object_or_404(Employe, id=emp_id)
+                tache.employes.add(employe)
+            
+            response_data = {
+                'message': 'Employés ajoutés à la tâche avec succès.',
+                'data': TacheSerializer(tache).data
+            }
+            return Response(response_data, status=status.HTTP_200_OK)
+        
+# le chef supprime des employés d'une tâche    
+@api_view(['POST'])
+def chef_supprimer_tache(request):
+                chef_id = request.data.get('chef_id')
+                tache_id = request.data.get('tache_id')
+                
+                # Vérifier si le chef_id est fourni
+                if not chef_id:
+                    return Response({"error": "Veuillez fournir chef_id."},
+                                    status=status.HTTP_400_BAD_REQUEST)
+                
+                # Récupérer le chef associé à l'identifiant fourni
+                chef = get_object_or_404(Chef, id=chef_id)
+                
+                # Récupérer la tâche à supprimer
+                tache = get_object_or_404(Tache, id=tache_id)
+                
+                # Vérifier si le chef est le propriétaire de la tâche
+                if tache.chef != chef:
+                    return Response({"error": "Vous n'êtes pas autorisé à supprimer cette tâche."},
+                                    status=status.HTTP_403_FORBIDDEN)
+                
+                # Supprimer la tâche
+                tache.delete()
+                
+                response_data = {
+                    'message': 'Tâche supprimée avec succès.'
+                }
+                return Response(response_data, status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+def get_all_taches(request):
+    taches = Tache.objects.all()
+    serializer = TacheSerializer(taches, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+
+         
+@api_view(['GET'])
+def get_all_employes(request):
+        employes = Employe.objects.all()
+        serializer = EmployeSerializer(employes, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
