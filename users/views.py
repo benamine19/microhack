@@ -150,31 +150,31 @@ def chef_add_tache_audio(request):
 
 
 
-# le chef ajouter des emploie pour une tache  
-@api_view(['POST'])
-def chef_add_tache(request):
-    chef_id = request.data.get('chef_id')
-    employes_id = request.data.get('employes_id', [])
-    etat = request.data.get('etat')
-    importance = request.data.get('importance')
-    # print("etat",etat)
-    # Vérifier si tous les champs requis sont présents dans la requête
-    if not (chef_id and description and etat and importance):
-        return Response({"error": "Veuillez fournir chef_id, description, etat et importance."},
-                        status=status.HTTP_400_BAD_REQUEST)
-    # Récupérer le chef associé à l'identifiant fourni
-    chef = get_object_or_404(Chef, id=chef_id)
-    tache = Tache.objects.create(
-                chef=chef,
-                description=description,
-                etat=etat,
-                importance=importance
-            )
-    response_data = {
-            'message': 'Tâche créée avec succès.',
-            'data': TacheSerializer(tache).data
-        }
-    return Response(response_data, status=status.HTTP_201_CREATED)
+# # le chef ajouter des emploie pour une tache  
+# @api_view(['POST'])
+# def chef_add_tache(request):
+#     chef_id = request.data.get('chef_id')
+#     employes_id = request.data.get('employes_id', [])
+#     etat = request.data.get('etat')
+#     importance = request.data.get('importance')
+#     # print("etat",etat)
+#     # Vérifier si tous les champs requis sont présents dans la requête
+#     if not (chef_id ):
+#         return Response({"error": "Veuillez fournir chef_id, description, etat et importance."},
+#                         status=status.HTTP_400_BAD_REQUEST)
+#     # Récupérer le chef associé à l'identifiant fourni
+#     chef = get_object_or_404(Chef, id=chef_id)
+#     tache = Tache.objects.create(
+#                 chef=chef,
+#                 description=description,
+#                 etat=etat,
+#                 importance=importance
+#             )
+#     response_data = {
+#             'message': 'Tâche créée avec succès.',
+#             'data': TacheSerializer(tache).data
+#         }
+#     return Response(response_data, status=status.HTTP_201_CREATED)
 
 
 
