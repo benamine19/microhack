@@ -48,4 +48,4 @@ class RegisterSerializerChef(serializers.ModelSerializer):
 class TacheSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tache
-        fields = ('_all_')
+        fields = "__all__"

@@ -89,12 +89,13 @@ def chef_add_tache(request):
                 importance=importance
             )
     print('sss',tache)
+    
     # Récupérer la liste des employés associés aux identifiants fournis
-    for emp_id in employes_id:
-        employe = get_object_or_404(Employe, id=emp_id)
-        tache.employes.add(employe)
+    # for emp_id in employes_id:
+    #     employe = get_object_or_404(Employe, id=emp_id)
+    #     tache.employes.add(employe)
+    #     print('TacheSerializer(tache).data ::',TacheSerializer(tache).data)
     response_data = {
-            'success': True,
             'message': 'Tâche créée avec succès.',
             'data': TacheSerializer(tache).data
         }
