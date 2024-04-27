@@ -47,21 +47,39 @@ ETAT_CHOICES = (
 )
 
 IMPORTANCE_CHOICES = (
-    ('urgence', 'urgence'),
-    ('not_urgence', 'not_urgence'),
-    ('moderate', 'moderate'),
+    ('Low', 'Low'),
+    ('Medium', 'Medium'),
+    ('High', 'High'),
 )
+
+
 
 class Tache(models.Model):
     chef = models.ForeignKey(Chef, on_delete=models.CASCADE, related_name='tasks')
     employes = models.ManyToManyField(Employe, verbose_name="Employés associés", related_name='tasks')
     description = models.TextField()
     etat = models.CharField(max_length=20, choices=ETAT_CHOICES, default='ready')
-    importance = models.CharField(max_length=20, choices=IMPORTANCE_CHOICES, default='not_urgence')
+    importance = models.CharField(max_length=20, choices=IMPORTANCE_CHOICES, default='Medium')
+    duration = models.CharField(max_length=20, default='00:00:00')
+    creationDate = models.DateTimeField(default=datetime.now)
     def __str__(self):
         return f"Tâche-{self.importance}-{self.description[:20]}"
     class Meta:
         verbose_name = "Tâche"
         verbose_name_plural = "Tâches"
+
+#The Employee can respond to the task by uploading an image and an audio file
+class TaskResponse(models.Model):
+    task = models.ForeignKey(Tache, on_delete=models.CASCADE, related_name='responses')
+    image = models.ImageField(upload_to='photos/')
+    percentage = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(100)])
+    audio = models.FileField(upload_to='audios/')
+    
+    def __str__(self):
+        return f"Response for {self.tache}"
+
+    class Meta:
+        verbose_name = "Réponse de tâche"
+        verbose_name_plural = "Réponses de tâches"
         
         
