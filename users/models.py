@@ -72,7 +72,7 @@ class Tache(models.Model):
 class TaskResponse(models.Model):
     task = models.ForeignKey(Tache, on_delete=models.CASCADE, related_name='responses')
     image = models.ImageField(upload_to='photos/')
-    percentage = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(100)])
+    percentage = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(1000)])
     audio = models.FileField(upload_to='audios/')
     
     def __str__(self):
