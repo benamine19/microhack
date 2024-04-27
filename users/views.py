@@ -340,6 +340,13 @@ def get_all_taches(request):
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 
+@api_view(['POST'])
+def get_tache_emploie(request):
+    chef_id = request.data.get('emp_id')
+    taches = Tache.objects.all().filter()
+    serializer = TacheSerializer(taches, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
 
          
 @api_view(['GET'])
@@ -355,14 +362,25 @@ def add_task_response(request):
         tache_id = request.data.get('tache_id')
         image_file = request.FILES.get('image')
         audio_file = request.FILES.get('audio')
-        
+        employes_id = request.data.get('employes_id', [])
         task = get_object_or_404(Tache, id=tache_id)
+        # verifier si l'employe est associé à la tache
         if image_file:
             task_response = TaskResponse(task=task,image=image_file,audio = audio_file,percentage=0)
             task_response.save()
             Evaluation = TaskEvaluation(task.description,task_response.image.url)
             print(Evaluation)
             task_response.percentage = Evaluation["percentage"] 
+            percentage=Evaluation["percentage"] 
+            
+            if (percentage>90):
+                task.etat='finish'
+                task.save()
+                employes = task.employes.all()
+                for employe in employes:
+                    employe.rank += 10
+                    employe.save()
+        
             response_data = {
                     'message': 'Tâche supprimée avec succès.',
                     'data': TacheResponseSerializer(task_response).data
@@ -374,3 +392,6 @@ def add_task_response(request):
     else:
         return Response({"error": "No image"},
                     status=status.HTTP_400_BAD_REQUEST)
+
+
+
