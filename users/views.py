@@ -340,6 +340,7 @@ def get_all_taches(request):
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 
+
 @api_view(['POST'])
 def get_tache_emploie(request):
     chef_id = request.data.get('emp_id')
